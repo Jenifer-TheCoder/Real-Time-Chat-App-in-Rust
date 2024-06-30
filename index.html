@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #chatContainer {
+            width: 100%;
+            max-width: 600px;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        #chat {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        #messageInput {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+        }
+        #messageInput input, #messageInput button {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #messageInput input {
+            flex: 1;
+            margin-right: 10px;
+        }
+        #messageInput button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-left: none;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background-color: #e1f5fe;
+            word-wrap: break-word;
+        }
+        .message span {
+            font-weight: bold;
+            color: #00796b;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <div id="chat"></div>
+        <div id="messageInput">
+            <input type="text" id="username" placeholder="Enter your name" autocomplete="off">
+            <input type="text" id="message" placeholder="Type your message here..." autocomplete="off">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let ws = new WebSocket("ws://127.0.0.1:8080/ws");
+
+        ws.onmessage = function(event) {
+            let chat = document.getElementById("chat");
+            let message = document.createElement("div");
+            message.className = "message";
+            message.textContent = event.data;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight;
+        };
+
+        function sendMessage() {
+            let usernameInput = document.getElementById("username");
+            let messageInput = document.getElementById("message");
+            if (usernameInput.value && messageInput.value) {
+                let message = usernameInput.value + ": " + messageInput.value;
+                ws.send(message);
+                messageInput.value = '';
+            } else {
+                alert("Please enter both your name and a message.");
+            }
+        }
+    </script>
+</body>
+</html>
